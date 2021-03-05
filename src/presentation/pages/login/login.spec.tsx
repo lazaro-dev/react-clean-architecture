@@ -15,7 +15,7 @@ const makeSut = (): SutTypes => {
   const sut = render(<Login validation={validationStub}/>);
   return {
     sut,
-    validationStub: validationStub
+    validationStub
   }
 }
 
@@ -72,6 +72,17 @@ describe('Login Component', () => {
     const passwordStatus = sut.getByTestId('password-status');
     expect(passwordStatus.title).toBe('Tudo ok');
     expect(passwordStatus.textContent).toBe('S');
+  });
+
+  test('should enable submit button if form is valid', () => {
+    const { sut, validationStub } = makeSut();
+    validationStub.errorMessage = null;
+    const emailInput = sut.getByTestId('email');    
+    fireEvent.input(emailInput, {target: { value: faker.internet.email()}});
+    const passwordInput = sut.getByTestId('password');    
+    fireEvent.input(passwordInput, {target: { value: faker.internet.password()}});
+    const submitButton = sut.getByTestId('submit') as HTMLButtonElement;
+    expect(submitButton.disabled).toBe(false);
   });
 
 
