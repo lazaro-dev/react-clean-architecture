@@ -1,4 +1,6 @@
 import React from 'react';
+import { Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 import { render, RenderResult, fireEvent, cleanup, waitFor, screen } from '@testing-library/react';
 import Login from './login';
 import { AuthenticationSpy, ValidationStub } from '@/presentation/test';
@@ -15,11 +17,16 @@ type SutParams = {
   validationError: string
 }
 
+const history = createMemoryHistory();
 const makeSut = (params?: SutParams): SutTypes => {
   const validationStub = new ValidationStub();
   const authenticationSpy = new AuthenticationSpy();
   validationStub.errorMessage = params?.validationError;
-  const sut = render(<Login validation={validationStub} authentication={authenticationSpy} />);
+  const sut = render(
+    <Router history={history}>
+      <Login validation={validationStub} authentication={authenticationSpy} />
+    </Router>
+  );
   return {
     sut,
     authenticationSpy
@@ -158,6 +165,14 @@ describe('Login Component', () => {
     simulateValidSubmit(sut);
     await waitFor(() => sut.getByTestId('form'));
     expect(localStorage.setItem).toHaveBeenLastCalledWith('accessToken', authenticationSpy.account.accessToken);
+  });
+
+  test('should add go to signup page', () => {
+    const { sut } = makeSut();    
+    const registre = sut.getByTestId('signup');
+    fireEvent.click(registre);
+    expect(history.length).toBe(2);
+    expect(history.location.pathname).toBe('/signup');
   });
 
 })
