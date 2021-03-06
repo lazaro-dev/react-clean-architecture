@@ -3,6 +3,7 @@ import { render, RenderResult, fireEvent, cleanup, waitFor, screen } from '@test
 import Login from './login';
 import { AuthenticationSpy, ValidationStub } from '@/presentation/test';
 import faker from 'faker';
+import 'jest-localstorage-mock';
 import { InvalidCredentialsError } from '@/domain/errors';
 
 type SutTypes = {
@@ -54,7 +55,9 @@ const simulateStatusForField = (sut: RenderResult, fieldName: string, validation
 
 describe('Login Component', () => {
   afterEach(cleanup);
-
+  beforeEach(() => {
+    localStorage.clear();
+  });
   test('should start with initial state', () => {
     const validationError = faker.random.words();
     const { sut } = makeSut({validationError});
@@ -149,5 +152,12 @@ describe('Login Component', () => {
   //   expect(screen.getByTestId('main-error')).toBe(error.message)
   //   expect(screen.getByTestId('error-wrap').children).toHaveLength(1)
   // });
+
+  test('should add accessToken to localstorage on success', async () => {
+    const { sut, authenticationSpy } = makeSut();    
+    simulateValidSubmit(sut);
+    await waitFor(() => sut.getByTestId('form'));
+    expect(localStorage.setItem).toHaveBeenLastCalledWith('accessToken', authenticationSpy.account.accessToken);
+  });
 
 })
