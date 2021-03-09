@@ -2,7 +2,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render, RenderResult, fireEvent, cleanup, waitFor, screen } from '@testing-library/react';
-import Login from './login';
+import { Login } from '@/presentation/pages';
 import { AuthenticationSpy, ValidationStub } from '@/presentation/test';
 import faker from 'faker';
 import 'jest-localstorage-mock';
