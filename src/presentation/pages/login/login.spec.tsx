@@ -165,8 +165,8 @@ describe('Login Component', () => {
     const error = new InvalidCredentialsError();
     jest.spyOn(authenticationSpy, 'auth').mockReturnValueOnce(Promise.reject(error))
     await simulateValidSubmit(sut);
-    // testElementText(sut, 'main-error', error.message);
-    // testErrorWrapChildCount(sut, 1);
+    testElementText(sut, 'main-error', error.message);
+    testErrorWrapChildCount(sut, 1);
     // expect(screen.getByTestId('main-error')).toBe(error.message)
     // expect(screen.getByTestId('error-wrap').children).toHaveLength(1)
   });
@@ -177,6 +177,17 @@ describe('Login Component', () => {
     expect(saveAccessTokenMock.accessToken).toBe(authenticationSpy.account.accessToken);
     expect(history.length).toBe(1);
     expect(history.location.pathname).toBe('/');
+  });
+
+  test('should present error if SaveAccessToken fails', async () => {
+    const { sut, saveAccessTokenMock } = makeSut();
+    const error = new InvalidCredentialsError();
+    jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
+    await simulateValidSubmit(sut);
+    testElementText(sut, 'main-error', error.message);
+    testErrorWrapChildCount(sut, 1);
+    // expect(screen.getByTestId('main-error')).toBe(error.message)
+    // expect(screen.getByTestId('error-wrap').children).toHaveLength(1)
   });
 
   test('should add go to signup page', () => {
